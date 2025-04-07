@@ -44,6 +44,6 @@ describe("anchor-vault", () => {
     })
     .signers([signer])
     .rpc();
-    console.log("Your transaction signature", tx);
+    console.log("transaction signature", tx);
   });
 });

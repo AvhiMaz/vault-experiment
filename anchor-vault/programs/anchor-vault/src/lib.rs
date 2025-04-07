@@ -17,4 +17,9 @@ pub mod anchor_vault {
         Ok(())
     }
 
+    pub fn deposit(ctx: Context<Deposit>, amount: u64) -> Result<()> {
+        ctx.accounts.deposit(amount)?;
+        Ok(())
+    }
+
 }
