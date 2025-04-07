@@ -8,9 +8,9 @@ pub struct Init<'info> {
     #[account(
         init,
         payer = signer,
-        seeds = [b"vault", signer.key().as_ref()],
+        seeds = [b"state", signer.key().as_ref()],
         bump,
-        space = Vault::INIT_SPACE
+        space = 8 + Vault::INIT_SPACE
     )]
     pub vault_state: Account<'info, Vault>,
 
