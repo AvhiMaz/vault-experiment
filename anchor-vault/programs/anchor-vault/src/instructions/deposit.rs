@@ -16,6 +16,7 @@ pub struct Deposit<'info> {
     pub vault_state: Account<'info, Vault>,
 
     #[account(
+        mut,
         seeds = [b"vault", vault_state.key().as_ref()],
         bump = vault_state.vault_bump,
     )]

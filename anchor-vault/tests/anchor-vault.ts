@@ -35,7 +35,8 @@ describe("anchor-vault", () => {
     program.programId
   )[0];
 
-    const tx = await program.methods.init()
+  try {
+const tx = await program.methods.init()
     .accounts({
       signer: signer.publicKey,
       vaultState,
@@ -45,5 +46,46 @@ describe("anchor-vault", () => {
     .signers([signer])
     .rpc();
     console.log("transaction signature", tx);
+
+  } catch (error){
+  console.log("error", error);
+  }
+      });
+
+  it("deposit", async () => {
+  const vaultState = PublicKey.findProgramAddressSync(
+    [Buffer.from("state"), signer.publicKey.toBuffer()],
+    program.programId
+  )[0];
+
+  const vault = PublicKey.findProgramAddressSync(
+    [Buffer.from("vault"), vaultState.toBuffer()],
+    program.programId
+  )[0];
+
+   const transferIx = SystemProgram.transfer({
+    fromPubkey: signer.publicKey,
+    toPubkey: vault,
+    lamports: 1_000_000, 
   });
+ 
+  try {
+  const tx = await program.methods.deposit(new anchor.BN(1000))
+  .accounts({
+    signer: signer.publicKey,
+    vaultState,
+    vault,
+    systemProgram: SystemProgram.programId
+  })
+  .signers([signer])
+  .rpc();
+
+  console.log("transaction signature", tx);
+
+  } catch (error){
+    console.log("error", error)
+  }
+  
+  })
+
 });
