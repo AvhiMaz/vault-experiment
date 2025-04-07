@@ -36,56 +36,56 @@ describe("anchor-vault", () => {
   )[0];
 
   try {
-const tx = await program.methods.init()
-    .accounts({
-      signer: signer.publicKey,
-      vaultState,
-      vault,
-      systemProgram: SystemProgram.programId
+    const tx = await program.methods.init()
+      .accounts({
+        signer: signer.publicKey,
+        vaultState,
+        vault,
+        systemProgram: SystemProgram.programId
+      })
+      .signers([signer])
+      .rpc();
+      console.log("transaction signature", tx);
+
+    } catch (error){
+    console.log("error", error);
+    }
+  });
+
+  it("deposit", async () => {
+
+    const vaultState = PublicKey.findProgramAddressSync(
+    [Buffer.from("state"), signer.publicKey.toBuffer()],
+    program.programId
+    )[0];
+
+    const vault = PublicKey.findProgramAddressSync(
+    [Buffer.from("vault"), vaultState.toBuffer()],
+    program.programId
+    )[0];
+
+    const tx = await provider.connection.requestAirdrop(
+     vault,
+      1_000_000_000
+    );
+
+    await provider.connection.confirmTransaction(tx, "confirmed");
+
+    try {
+      const tx = await program.methods.deposit(new anchor.BN(1000))
+      .accounts({
+        signer: signer.publicKey,
+        vaultState,
+        vault,
+        systemProgram: SystemProgram.programId
     })
     .signers([signer])
     .rpc();
+
     console.log("transaction signature", tx);
 
-  } catch (error){
-  console.log("error", error);
-  }
-      });
-
-  it("deposit", async () => {
-  const vaultState = PublicKey.findProgramAddressSync(
-    [Buffer.from("state"), signer.publicKey.toBuffer()],
-    program.programId
-  )[0];
-
-  const vault = PublicKey.findProgramAddressSync(
-    [Buffer.from("vault"), vaultState.toBuffer()],
-    program.programId
-  )[0];
-
-   const transferIx = SystemProgram.transfer({
-    fromPubkey: signer.publicKey,
-    toPubkey: vault,
-    lamports: 1_000_000, 
-  });
- 
-  try {
-  const tx = await program.methods.deposit(new anchor.BN(1000))
-  .accounts({
-    signer: signer.publicKey,
-    vaultState,
-    vault,
-    systemProgram: SystemProgram.programId
+    } catch (error){
+      console.log("error", error)
+    }
   })
-  .signers([signer])
-  .rpc();
-
-  console.log("transaction signature", tx);
-
-  } catch (error){
-    console.log("error", error)
-  }
-  
-  })
-
 });
