@@ -88,4 +88,42 @@ describe("anchor-vault", () => {
       console.log("error", error)
     }
   })
+
+  it("withdraw", async () => {
+
+    const vaultState = PublicKey.findProgramAddressSync(
+    [Buffer.from("state"), signer.publicKey.toBuffer()],
+    program.programId
+    )[0];
+
+    const vault = PublicKey.findProgramAddressSync(
+    [Buffer.from("vault"), vaultState.toBuffer()],
+    program.programId
+    )[0];
+
+    let balanebefore = await provider.connection.getBalance(vault);
+    console.log(balanebefore);
+
+    try {
+      const tx = await program.methods.withdraw(new anchor.BN(1000))
+      .accounts({
+        signer: signer.publicKey,
+        vaultState,
+        vault,
+        systemProgram: SystemProgram.programId
+    })
+    .signers([signer])
+    .rpc();
+
+    let balanceafter= await provider.connection.getBalance(vault);
+    console.log(balanceafter);
+
+
+    console.log("transaction signature", tx);
+
+    } catch (error){
+      console.log("error", error)
+    }
+  })
+
 });
