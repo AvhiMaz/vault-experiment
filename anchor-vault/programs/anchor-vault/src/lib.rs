@@ -27,4 +27,9 @@ pub mod anchor_vault {
         Ok(())
     }
 
+    pub fn close(ctx: Context<Close>) -> Result<()> {
+        ctx.accounts.close()?;
+        Ok(())
+    }
+
 }
