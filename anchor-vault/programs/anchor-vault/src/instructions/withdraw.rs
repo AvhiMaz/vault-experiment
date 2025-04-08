@@ -1,33 +1,33 @@
-use anchor_lang::{prelude::*, system_program::{transfer, Transfer}};
+use anchor_lang::{
+    prelude::*,
+    system_program::{transfer, Transfer},
+};
 
 use crate::states::Vault;
 
 #[derive(Accounts)]
 pub struct Withdraw<'info> {
     #[account(mut)]
-    pub signer : Signer<'info>,
+    pub signer: Signer<'info>,
 
     #[account(
         seeds = [b"state", signer.key().as_ref()],
         bump = vault_state.state_bump,
     )]
     pub vault_state: Account<'info, Vault>,
-
     #[account(
         mut,
         seeds = [b"vault", vault_state.key().as_ref()],
         bump = vault_state.vault_bump,
     )]
-
     pub vault: SystemAccount<'info>,
 
-    pub system_program: Program<'info, System>
+    pub system_program: Program<'info, System>,
 }
 
-
-impl <'info> Withdraw <'info> {
+impl Withdraw<'_> {
     pub fn withdraw(&mut self, amount: u64) -> Result<()> {
-        let cpi_program  = self.system_program.to_account_info();
+        let cpi_program = self.system_program.to_account_info();
 
         let cpi_account = Transfer {
             from: self.vault.to_account_info(),
@@ -36,11 +36,7 @@ impl <'info> Withdraw <'info> {
 
         let binding = self.vault_state.to_account_info().key();
 
-        let seeds = &[
-            b"vault",
-            binding.as_ref(),
-            &[self.vault_state.vault_bump],
-        ];
+        let seeds = &[b"vault", binding.as_ref(), &[self.vault_state.vault_bump]];
 
         let signer_seeds = &[&seeds[..]];
 

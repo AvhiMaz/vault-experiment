@@ -1,5 +1,5 @@
-use anchor_lang::prelude::*;
 use crate::states::Vault;
+use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
 pub struct Init<'info> {
@@ -18,15 +18,13 @@ pub struct Init<'info> {
         seeds = [b"vault", vault_state.key().as_ref()],
         bump,
     )]
-
     pub vault: SystemAccount<'info>,
 
-    pub system_program: Program<'info, System>
+    pub system_program: Program<'info, System>,
 }
 
-impl <'info> Init <'info> {
+impl Init<'_> {
     pub fn init(&mut self, bumps: &InitBumps) -> Result<()> {
-        
         self.vault_state.vault_bump = bumps.vault;
         self.vault_state.state_bump = bumps.vault_state;
 

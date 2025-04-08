@@ -1,11 +1,13 @@
-use anchor_lang::{prelude::*, system_program::{transfer, Transfer}};
+use anchor_lang::{
+    prelude::*,
+    system_program::{transfer, Transfer},
+};
 
 use crate::states::Vault;
 
 #[derive(Accounts)]
 
 pub struct Deposit<'info> {
-
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -20,16 +22,13 @@ pub struct Deposit<'info> {
         seeds = [b"vault", vault_state.key().as_ref()],
         bump = vault_state.vault_bump,
     )]
-
     pub vault: SystemAccount<'info>,
 
-    pub system_program: Program<'info, System>
+    pub system_program: Program<'info, System>,
 }
 
-
-impl <'info> Deposit <'info> {
-    pub fn deposit (&mut self, amount: u64) -> Result<()> {
-
+impl Deposit<'_> {
+    pub fn deposit(&mut self, amount: u64) -> Result<()> {
         let cpi_program = self.system_program.to_account_info();
 
         let cpi_accounts = Transfer {
@@ -37,7 +36,7 @@ impl <'info> Deposit <'info> {
             to: self.vault.to_account_info(),
         };
 
-        let cpi_ctx= CpiContext::new(cpi_program, cpi_accounts); 
+        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
 
         transfer(cpi_ctx, amount)?;
 
