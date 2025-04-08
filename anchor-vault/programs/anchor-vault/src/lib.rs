@@ -22,4 +22,9 @@ pub mod anchor_vault {
         Ok(())
     }
 
+    pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+        ctx.accounts.withdraw(amount)?;
+        Ok(())
+    }
+
 }
