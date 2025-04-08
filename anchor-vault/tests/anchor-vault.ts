@@ -126,4 +126,34 @@ describe("anchor-vault", () => {
     }
   })
 
+  it("close", async () => {
+
+    const vaultState = PublicKey.findProgramAddressSync(
+    [Buffer.from("state"), signer.publicKey.toBuffer()],
+    program.programId
+    )[0];
+
+    const vault = PublicKey.findProgramAddressSync(
+    [Buffer.from("vault"), vaultState.toBuffer()],
+    program.programId
+    )[0];
+
+
+    try {
+      const tx = await program.methods.close()
+      .accounts({
+        signer: signer.publicKey,
+        vaultState,
+        vault,
+        systemProgram: SystemProgram.programId
+    })
+    .signers([signer])
+    .rpc();
+
+    console.log("transaction signature", tx);
+
+    } catch (error){
+      console.log("error", error)
+    }
+  })
 });
