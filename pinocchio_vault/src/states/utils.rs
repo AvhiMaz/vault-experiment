@@ -1,6 +1,6 @@
 use pinocchio::program_error::ProgramError;
 
-use crate::error::MyProgramError;
+use crate::errors::MyProgramError;
 
 pub trait DataLen {
     const LEN: usize;
