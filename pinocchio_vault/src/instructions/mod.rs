@@ -19,7 +19,7 @@ impl TryFrom<&u8> for VaultInstruction {
         match *value {
             0 => Ok(VaultInstruction::Deposit),
             1 => Ok(VaultInstruction::Withdraw),
-            _ => Ok(ProgramError::InvalidInstructionData),
+            _ => Err(ProgramError::InvalidInstructionData),
         }
     }
 }

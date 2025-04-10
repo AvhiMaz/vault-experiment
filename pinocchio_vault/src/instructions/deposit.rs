@@ -1,4 +1,9 @@
-use pinocchio::{account_info::AccountInfo, program_error::ProgramError, pubkey::Pubkey, ProgramResult};
+use pinocchio::{
+    account_info::AccountInfo,
+    program_error::ProgramError,
+    pubkey::{self},
+    ProgramResult,
+};
 use pinocchio_system::instructions::Transfer;
 
 pub const LAMPORTS_PER_SOL: u64 = 1_000_000_000;
@@ -12,7 +17,7 @@ pub struct DeposiIxtData {
 }
 
 impl DataLen for DeposiIxtData {
-    const LEN: usize = core::mem::size_of::<DeposiIxtData>;
+    const LEN: usize = core::mem::size_of::<DeposiIxtData>();
 }
 
 pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
@@ -24,19 +29,26 @@ pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
         return Err(ProgramError::MissingRequiredSignature);
     }
 
-    let ix_data = load_ix_data<DeposiIxtData>(data)?;
+    let ix_data = load_ix_data::<DeposiIxtData>(data)?;
 
-    let vault_pda = Pubkey::create_program_address(&["vault_pda"], &[ix_data.bump], &crate::ID);
-
+    let vault_pda = pubkey::create_program_address(
+        &[
+            "pinocchio_vault_pda".as_bytes(),
+            deposit_acc.key(),
+            &[ix_data.bump],
+        ],
+        &crate::ID,
+    )?;
     if vault_acc.key() != &vault_pda {
         return Err(ProgramError::InvalidAccountData);
     }
 
-    Transfer{
+    Transfer {
         from: deposit_acc,
         to: vault_acc,
-        lamports: ix_data.amount * LAMPORTS_PER_SOL
-    }.invoke()?;
-    
+        lamports: ix_data.amount * LAMPORTS_PER_SOL,
+    }
+    .invoke()?;
+
     Ok(())
 }
